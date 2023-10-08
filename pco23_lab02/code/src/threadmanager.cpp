@@ -110,7 +110,7 @@ QString ThreadManager::startHacking(
 
     /* Crée les threads, on ajoutant leur pointeur à la liste.
        Les threads sont immédiatement lancés par le constructeur. */
-    for(int i = 0; i < nbThreads; i++){
+    for(unsigned int i = 0; i < nbThreads; i++){
 
         currentPasswordString.fill(charset.at(pos),nbChars);
         currentPasswordArray.fill(0,nbChars);

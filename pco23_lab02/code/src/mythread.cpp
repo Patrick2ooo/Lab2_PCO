@@ -45,6 +45,8 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
             ThreadManager::incrementPercentComputed((double)1000/nbToCompute)
         }*/
 
+
+
         /*
          * On récupère le mot de pass à tester suivant.
          *
