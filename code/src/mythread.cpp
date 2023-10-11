@@ -4,10 +4,9 @@
 #include <QString>
 #include <string>
 
+QString resultat = "";//Mot de passe trouvé au final, reste "" si pas trouvé
 
-void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute, QString &resultat) {
-
-    resultat = QString("");
+void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute) {
     QString currentHash;
     unsigned int nbValidChars;
     unsigned int i;
@@ -38,13 +37,9 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
             resultat = currentPasswordString;
 
         /*
-         * Tous les 1000 hash calculés, on notifie qui veut bien entendre
-         * de l'état de notre avancement (pour la barre de progression)
+         * Tous les 1000 hash calculés, on notifie l'avancement des threads
          */
-        /*if ((nbComputed % 1000) == 0) {
-            ThreadManager::incrementPercentComputed((double)1000/nbToCompute)
-        }*/
-
+        //TODO
 
         /*
          * On récupère le mot de pass à tester suivant.

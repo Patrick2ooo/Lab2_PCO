@@ -6,6 +6,8 @@
 #include "threadmanager.h"
 #include <future>
 
+extern QString resultat;
+
 /*
  * std::pow pour les long long unsigned int
  */
@@ -98,9 +100,6 @@ QString ThreadManager::startHacking(
      */
     int pos = 0;
     std::vector<std::unique_ptr<PcoThread>> threadList;
-    QString resultat;
-    std::vector<QString> results;
-    //std::vector<std::future<QString>> futures;
 
     /* Crée les threads, on ajoutant leur pointeur à la liste.
        Les threads sont immédiatement lancés par le constructeur. */
@@ -112,10 +111,8 @@ QString ThreadManager::startHacking(
         pos += nbValidChars / nbThreads;
         nbToCompute = nbToCompute / nbThreads;
 
-        PcoThread *currentThread = new PcoThread([hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, &resultat]() { monHack(hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, resultat); });
+        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
-
-        results.push_back(std::ref(resultat));
     }
 
     /* Attends la fin de chaque thread et libère la mémoire associée.
@@ -125,15 +122,9 @@ QString ThreadManager::startHacking(
         threadList[i]->join();
     }
 
-
     /* Vide la liste de pointeurs de threads */
     threadList.clear();
 
-    for (const QString &res: results) {
-        if (res != QString("")) {
-            return resultat;
-        }
-    }
 
     /*
      * Tant qu'on a pas tout essayé...
@@ -196,4 +187,5 @@ QString ThreadManager::startHacking(
      * été testés, et qu'aucun n'est la préimage de ce hash.
      */
     //return QString("");
+    return resultat;
 }
