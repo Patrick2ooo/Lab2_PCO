@@ -1,18 +1,17 @@
 #include <QCryptographicHash>
 #include <QVector>
 
-#include "threadmanager.h"
-#include "pcosynchro/pcothread.h"
 #include "mythread.h"
+#include "pcosynchro/pcothread.h"
+#include "threadmanager.h"
 #include <future>
 
 /*
  * std::pow pour les long long unsigned int
  */
-long long unsigned int intPow (
+long long unsigned int intPow(
         long long unsigned int number,
-        long long unsigned int index)
-{
+        long long unsigned int index) {
     long long unsigned int i;
 
     if (index == 0)
@@ -26,13 +25,10 @@ long long unsigned int intPow (
     return number;
 }
 
-ThreadManager::ThreadManager(QObject *parent) :
-    QObject(parent)
-{}
+ThreadManager::ThreadManager(QObject *parent) : QObject(parent) {}
 
 
-void ThreadManager::incrementPercentComputed(double percentComputed)
-{
+void ThreadManager::incrementPercentComputed(double percentComputed) {
     emit sig_incrementPercentComputed(percentComputed);
 }
 
@@ -53,9 +49,7 @@ QString ThreadManager::startHacking(
         QString salt,
         QString hash,
         unsigned int nbChars,
-        unsigned int nbThreads
-)
-{
+        unsigned int nbThreads) {
     unsigned int i;
 
     long long unsigned int nbToCompute;
@@ -90,13 +84,13 @@ QString ThreadManager::startHacking(
     /*
      * Calcul du nombre de hash à générer
      */
-    nbToCompute        = intPow(charset.length(),nbChars);
-    nbComputed         = 0;
+    nbToCompute = intPow(charset.length(), nbChars);
+    nbComputed = 0;
 
     /*
      * Nombre de caractères différents pouvant composer le mot de passe
      */
-    nbValidChars       = charset.length();
+    nbValidChars = charset.length();
 
     /*
      * On initialise le premier mot de passe à tester courant en le remplissant
@@ -110,26 +104,24 @@ QString ThreadManager::startHacking(
 
     /* Crée les threads, on ajoutant leur pointeur à la liste.
        Les threads sont immédiatement lancés par le constructeur. */
-    for(unsigned int i = 0; i < nbThreads; i++){
+    for (unsigned int i = 0; i < nbThreads; i++) {
 
-        currentPasswordString.fill(charset.at(pos),nbChars);
-        currentPasswordArray.fill(0,nbChars);
+        currentPasswordString.fill(charset.at(pos), nbChars);
+        currentPasswordArray.fill(0, nbChars);
 
-        pos += nbValidChars/nbThreads;
-        nbToCompute = nbToCompute/nbThreads;
+        pos += nbValidChars / nbThreads;
+        nbToCompute = nbToCompute / nbThreads;
 
-        PcoThread *currentThread = new PcoThread([hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, &resultat](){monHack(hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, resultat);});
+        PcoThread *currentThread = new PcoThread([hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, &resultat]() { monHack(hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute, resultat); });
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
 
         results.push_back(std::ref(resultat));
-
     }
 
     /* Attends la fin de chaque thread et libère la mémoire associée.
      * Durant l'attente, l'application est bloquée.
      */
-    for (long unsigned int i=0; i<nbThreads; i++)
-    {
+    for (long unsigned int i = 0; i < nbThreads; i++) {
         threadList[i]->join();
     }
 
@@ -137,8 +129,8 @@ QString ThreadManager::startHacking(
     /* Vide la liste de pointeurs de threads */
     threadList.clear();
 
-    for(const QString &res : results){
-        if(res != QString("")){
+    for (const QString &res: results) {
+        if (res != QString("")) {
             return resultat;
         }
     }

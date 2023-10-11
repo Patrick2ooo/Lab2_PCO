@@ -1,11 +1,11 @@
 #include "mythread.h"
 #include "threadmanager.h"
-#include <string>
 #include <QCryptographicHash>
 #include <QString>
+#include <string>
 
 
-void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute, QString &resultat){
+void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute, QString &resultat) {
 
     resultat = QString("");
     QString currentHash;
@@ -13,11 +13,11 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
     unsigned int i;
     long long unsigned int nbComputed;
 
-    nbComputed         = 0;
+    nbComputed = 0;
 
     QCryptographicHash md5(QCryptographicHash::Md5);
 
-    nbValidChars       = charset.length();
+    nbValidChars = charset.length();
 
     /*
      * Tant qu'on a pas tout essayé...
@@ -46,7 +46,6 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
         }*/
 
 
-
         /*
          * On récupère le mot de pass à tester suivant.
          *
@@ -58,7 +57,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
          */
         i = 0;
 
-        while (i < (unsigned int)currentPasswordArray.size()) {
+        while (i < (unsigned int) currentPasswordArray.size()) {
             currentPasswordArray[i]++;
 
             if (currentPasswordArray[i] >= nbValidChars) {
@@ -72,10 +71,9 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
          * On traduit les index présents dans currentPasswordArray en
          * caractères
          */
-        for (i=0;i<nbChars;i++)
-            currentPasswordString[i]  = charset.at(currentPasswordArray.at(i));
+        for (i = 0; i < nbChars; i++)
+            currentPasswordString[i] = charset.at(currentPasswordArray.at(i));
 
         nbComputed++;
     }
-
 }

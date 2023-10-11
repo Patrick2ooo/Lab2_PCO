@@ -1,4 +1,4 @@
-    /**
+/**
   \file threadmanager.h
   \author Yann Thoma
   \date 24.02.2017
@@ -21,11 +21,9 @@
  *
  * Cette classe tente de reverser un hash md5 par brute force.
  */
-class ThreadManager: public QObject
-{
+class ThreadManager : public QObject {
     Q_OBJECT
 private:
-
 public:
     /**
      * \brief ThreadManager Constructeur simple
@@ -50,8 +48,7 @@ public:
             QString salt,
             QString hash,
             unsigned int nbChars,
-            unsigned int nbThreads
-    );
+            unsigned int nbThreads);
 
 
     /**
@@ -72,4 +69,4 @@ signals:
     void sig_incrementPercentComputed(double percentComputed);
 };
 
-#endif // THREADMANAGER_H
+#endif// THREADMANAGER_H

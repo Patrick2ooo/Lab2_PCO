@@ -10,11 +10,9 @@ const QString MainWindow::validChars = QString("abcdefghijklmnopqrstuvwxyz"
                                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                "1234567890!$~*");
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    threadManager(new ThreadManager(parent))
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+                                          ui(new Ui::MainWindow),
+                                          threadManager(new ThreadManager(parent)) {
     /*
      * ui est l'instance de la classe représentant notre interface graphique
      */
@@ -32,20 +30,20 @@ MainWindow::MainWindow(QWidget *parent) :
      *   Ce signal transmet en paramètre un double
      */
     connect(
-                ui->btnCrack,
-                SIGNAL(clicked()),
-                this,
-                SLOT(prepareHacking()));
+            ui->btnCrack,
+            SIGNAL(clicked()),
+            this,
+            SLOT(prepareHacking()));
     connect(
-                &hackingWatcher,
-                SIGNAL(finished()),
-                this,
-                SLOT(endHacking()));
+            &hackingWatcher,
+            SIGNAL(finished()),
+            this,
+            SLOT(endHacking()));
     connect(
-                threadManager,
-                SIGNAL(sig_incrementPercentComputed(double)),
-                this,
-                SLOT(incrementProgressBar(double)));
+            threadManager,
+            SIGNAL(sig_incrementPercentComputed(double)),
+            this,
+            SLOT(incrementProgressBar(double)));
 
     /*
      * On prépare une expression régulière pour valider le hash
@@ -59,8 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 /*
  * La fonction ci-dessous est exécutée à chaque appui sur le bouton "Crack!"
  */
-void MainWindow::prepareHacking()
-{
+void MainWindow::prepareHacking() {
     /*
      * Un meme évènement sous QT est traité de manière séquentielle dans tous
      * les cas. Le test ci-dessous permet donc d'éviter qu'on lance deux groupes
@@ -75,15 +72,15 @@ void MainWindow::prepareHacking()
      * Controle de saisie
      */
     if (!hashValidationRegExp.exactMatch(ui->inputHash->text()))
-       inputError =    "Error: invalid hash. A MD5 hash is 32 chars long, with"
-                        "chars in following set: 0 to 9 or a to f";
+        inputError = "Error: invalid hash. A MD5 hash is 32 chars long, with"
+                     "chars in following set: 0 to 9 or a to f";
 
     if (ui->inputThreads->text().toInt() <= 0)
-       inputError =     "Error: the number of threads must be greather than 0.";
+        inputError = "Error: the number of threads must be greather than 0.";
 
     if (ui->inputNbChars->text().toInt() <= 0)
-       inputError =     "Error: the password's number of characters must be"
-                        "greather than 0.";
+        inputError = "Error: the password's number of characters must be"
+                     "greather than 0.";
 
     if (inputError.length()) {
         QMessageBox msgBox;
@@ -97,8 +94,8 @@ void MainWindow::prepareHacking()
      * Si le controle de saisie est passé, on met le flag isHacking à true et on
      * initialise la progression à zéro.
      */
-    isHacking       = true;
-    progress        = 0;
+    isHacking = true;
+    progress = 0;
 
     /*
      * Désactivation des champs du formulaire
@@ -117,14 +114,14 @@ void MainWindow::prepareHacking()
      * Appel de la fonction startHacking du threadManager de manière non
      * bloquante.
      */
-    hackingAsync    =  QtConcurrent::run(
-                threadManager,
-                &ThreadManager::startHacking,
-                validChars,
-                ui->inputSalt->text(),
-                ui->inputHash->text().toLower(),/* force le hash en minuscule */
-                ui->inputNbChars->text().toInt(),
-                ui->inputThreads->text().toInt());
+    hackingAsync = QtConcurrent::run(
+            threadManager,
+            &ThreadManager::startHacking,
+            validChars,
+            ui->inputSalt->text(),
+            ui->inputHash->text().toLower(), /* force le hash en minuscule */
+            ui->inputNbChars->text().toInt(),
+            ui->inputThreads->text().toInt());
     /*
      * Ajout d'un watcher permettant de signaler à MainWindow la fin de la tache
      * asynchrone
@@ -135,29 +132,27 @@ void MainWindow::prepareHacking()
  * La fonction ci-dessous est exécutée à chaque réception d'un signal
  * incrementPercentComputed en provenance de threadManager
  */
-void MainWindow::incrementProgressBar(double percent)
-{
+void MainWindow::incrementProgressBar(double percent) {
     progress += percent;
-    ui->progressBar->setValue(100*progress);
+    ui->progressBar->setValue(100 * progress);
 }
 /*
  * La fonction ci-dessous est exécutée à la réception réception d'un signal
  * finished en provenance du hackingWatcher, indiquant que la fonction
  * startHacking du hackingManger a retourné.
  */
-void MainWindow::endHacking()
-{
+void MainWindow::endHacking() {
     QMessageBox msgBox;
 
     msgBox.setWindowTitle("Results");
 
     if (hackingAsync.result().length() > 0) {
-        msgBox.setText("Found! \nPassword: "+ hackingAsync.result() +
-                       "\nElapsed Time: "+
-                       QString::number(chronometer.elapsed())+" ms");
+        msgBox.setText("Found! \nPassword: " + hackingAsync.result() +
+                       "\nElapsed Time: " +
+                       QString::number(chronometer.elapsed()) + " ms");
     } else {
         msgBox.setText("Not found... \nElapsed time: " +
-                       QString::number(chronometer.elapsed())+" ms");
+                       QString::number(chronometer.elapsed()) + " ms");
     }
 
     /*

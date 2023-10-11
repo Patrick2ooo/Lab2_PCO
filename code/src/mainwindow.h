@@ -14,17 +14,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QList>
 #include <QElapsedTimer>
-#include <QTimer>
+#include <QList>
+#include <QMainWindow>
 #include <QRegExp>
+#include <QTimer>
 #include <QtCore>
 
 #include "threadmanager.h"
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
 /**
@@ -33,39 +33,37 @@ class MainWindow;
  * Cette classe est une interface graphique qui permet à l'utilisateur de
  * proposer le hash md5 d'un mot de passe à retrouver avec plusieurs threads.
  */
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 private:
-
     //! Caractères acceptés pour le mot de passe.
     static const QString validChars;
 
     //! Instance de l'interface graphique.
-    Ui::MainWindow  *ui;
+    Ui::MainWindow *ui;
 
     //! Instance du thread "Manager" qui gère les autres threads responsable du
     //! hack du mot de passe stocké dans le hash md5.
-    ThreadManager   *threadManager;
+    ThreadManager *threadManager;
 
     //! Chronnomètre qui mesure le temps nécessaire au reverse du hash md5.
-    QElapsedTimer   chronometer;
+    QElapsedTimer chronometer;
 
     //! Expression régulière pour valider les entrèes de l'utilisateur.
-    QRegExp         hashValidationRegExp;
+    QRegExp hashValidationRegExp;
 
     //! Tâche non-bloquante qui exécute les threads responsables du hack.
-    QFuture<QString>        hackingAsync;
+    QFuture<QString> hackingAsync;
 
     //! Utiliser pour signaler la fin de l'exécution des threads responsables
     //! du hack.
     QFutureWatcher<QString> hackingWatcher;
 
     //! La valeur de la barre de progression.
-    double  progress;
+    double progress;
 
     //! Flag qui indique si le programme a reversé le hash md5.
-    bool    isHacking;
+    bool isHacking;
 
 public:
     /**
@@ -75,7 +73,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
 
 signals:
-    
+
 public slots:
     /**
      * \brief prepareHacking Méthode qui récupère les paramètres entrés par
@@ -94,4 +92,4 @@ public slots:
     void incrementProgressBar(double percent);
 };
 
-#endif // MAINWINDOW_H
+#endif// MAINWINDOW_H
