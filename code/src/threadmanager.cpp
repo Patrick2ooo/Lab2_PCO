@@ -4,9 +4,10 @@
 #include "mythread.h"
 #include "pcosynchro/pcothread.h"
 #include "threadmanager.h"
-#include <future>
+#include <numeric>
 
 extern QString resultat;
+//extern std::vector<long long unsigned int> percentComputed;
 
 /*
  * std::pow pour les long long unsigned int
@@ -52,10 +53,8 @@ QString ThreadManager::startHacking(
         QString hash,
         unsigned int nbChars,
         unsigned int nbThreads) {
-    unsigned int i;
 
     long long unsigned int nbToCompute;
-    long long unsigned int nbComputed;
 
     /*
      * Nombre de caractères différents pouvant composer le mot de passe
@@ -87,7 +86,6 @@ QString ThreadManager::startHacking(
      * Calcul du nombre de hash à générer
      */
     nbToCompute = intPow(charset.length(), nbChars);
-    nbComputed = 0;
 
     /*
      * Nombre de caractères différents pouvant composer le mot de passe
@@ -110,11 +108,18 @@ QString ThreadManager::startHacking(
 
         pos += nbValidChars / nbThreads;
         //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
-        nbToCompute = ceil((double) nbToCompute / nbThreads);
+        long long unsigned int nbToComputedDivided = ceil((double) nbToCompute / nbThreads);
 
-        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToCompute);
+        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToComputedDivided, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
+
+
     }
+
+    /*unsigned int init = 0;
+    if ((std::accumulate(percentComputed.begin(), percentComputed.end(),init) % 1000) == 0) {
+        incrementPercentComputed((double)1000/nbToCompute);
+    }*/
 
     /* Attends la fin de chaque thread et libère la mémoire associée.
      * Durant l'attente, l'application est bloquée.
