@@ -6,6 +6,8 @@
 
 QString resultat = "";//Mot de passe trouvé au final, reste "" si pas trouvé
 
+
+
 void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute,long long unsigned int maxCompute, ThreadManager *threadManager) {
     QString currentHash;
     unsigned int nbValidChars;
@@ -21,7 +23,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
     /*
      * Tant qu'on a pas tout essayé...
      */
-    while (nbComputed <= nbToCompute) {
+    while (nbComputed < nbToCompute) {
         /* On vide les données déjà ajoutées au générateur */
         md5.reset();
         /* On préfixe le mot de passe avec le sel */
@@ -33,6 +35,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
         /*
          * Si on a trouvé, on retourne le mot de passe courant (sans le sel) et on arrête la recherche
          */
+
         if (currentHash == hash){
             resultat = currentPasswordString;
             nbComputed = maxCompute;

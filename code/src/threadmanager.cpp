@@ -108,7 +108,7 @@ QString ThreadManager::startHacking(
          * de nbChars fois du premier caractère de charset
          */
         currentPasswordString.fill(charset.at(pos), nbChars);
-        currentPasswordArray.fill(0, nbChars);
+        currentPasswordArray.fill(pos, nbChars);
         pos += nbValidChars / nbThreads;
 
         //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
@@ -116,8 +116,7 @@ QString ThreadManager::startHacking(
 
         PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToComputeDivided, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
-
-
+        currentThread->requestStop();
     }
 
     /* Attends la fin de chaque thread et libère la mémoire associée.
@@ -132,3 +131,11 @@ QString ThreadManager::startHacking(
 
     return resultat;
 }
+
+
+
+
+
+
+
+
