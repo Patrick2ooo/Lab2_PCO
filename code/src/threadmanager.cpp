@@ -7,7 +7,6 @@
 #include <numeric>
 
 extern QString resultat;
-//extern std::vector<long long unsigned int> percentComputed;
 
 /*
  * std::pow pour les long long unsigned int
@@ -56,6 +55,10 @@ QString ThreadManager::startHacking(
 
     long long unsigned int nbToCompute;
 
+
+    //Init du resultat avant chaque nouvelle recherche de mot de passe
+    resultat = "";
+
     /*
      * Nombre de caractères différents pouvant composer le mot de passe
      */
@@ -92,10 +95,7 @@ QString ThreadManager::startHacking(
      */
     nbValidChars = charset.length();
 
-    /*
-     * On initialise le premier mot de passe à tester courant en le remplissant
-     * de nbChars fois du premier caractère de charset
-     */
+
     int pos = 0;
     std::vector<std::unique_ptr<PcoThread>> threadList;
 
@@ -103,23 +103,22 @@ QString ThreadManager::startHacking(
        Les threads sont immédiatement lancés par le constructeur. */
     for (unsigned int i = 0; i < nbThreads; i++) {
 
+        /*
+         * On initialise le premier mot de passe à tester courant en le remplissant
+         * de nbChars fois du premier caractère de charset
+         */
         currentPasswordString.fill(charset.at(pos), nbChars);
         currentPasswordArray.fill(0, nbChars);
-
         pos += nbValidChars / nbThreads;
-        //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
-        long long unsigned int nbToComputedDivided = ceil((double) nbToCompute / nbThreads);
 
-        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToComputedDivided, nbToCompute, this);
+        //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
+        long long unsigned int nbToComputeDivided = ceil((double) nbToCompute / nbThreads);
+
+        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToComputeDivided, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
 
 
     }
-
-    /*unsigned int init = 0;
-    if ((std::accumulate(percentComputed.begin(), percentComputed.end(),init) % 1000) == 0) {
-        incrementPercentComputed((double)1000/nbToCompute);
-    }*/
 
     /* Attends la fin de chaque thread et libère la mémoire associée.
      * Durant l'attente, l'application est bloquée.
