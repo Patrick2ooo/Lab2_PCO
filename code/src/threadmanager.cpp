@@ -96,18 +96,29 @@ QString ThreadManager::startHacking(
      */
     nbValidChars = charset.length();
 
+    //Nombre de mot de passe à tester pour chaque thread, arrondi en à l'entier dessus pour couvrir jusqu'à la fin même s'il y a quelques overlaps.
+    long long unsigned int nbToComputePerThread = ceil((double) nbToCompute / (double) nbThreads);
+    //Index du premier mot de passe du dernier thread géré
+    long long unsigned firstPasswordIndex = 0;
+
+
     logger() << std::endl
              << std::endl
              << "Starting bruteforce on " << hash.toStdString()
              << std::endl
+             << "with nbToComputePerThread = " << nbToComputePerThread
              << " with pwd length of " << nbChars << " and "
              << nbThreads << " threads..." << std::endl
              << "Charset: " << charset.toStdString() << std::endl
              << std::endl
              << "Start:";
 
-    int pos = 0;
     std::vector<std::unique_ptr<PcoThread>> threadList;
+
+    //S'il y a plus de thread que de valeur à calculer
+    //(ce qui peut vite arriver sur des petits mots de passes)
+    // on ne veut pas que des threads soient créés pour calculer un seul mot de passe doublon des autres.
+    if (nbThreads >= nbToCompute) nbThreads = nbToCompute;
 
     /* Crée les threads, on ajoutant leur pointeur à la liste.
        Les threads sont immédiatement lancés par le constructeur. */
@@ -117,21 +128,39 @@ QString ThreadManager::startHacking(
          * On initialise le premier mot de passe à tester courant en le remplissant
          * de nbChars fois du premier caractère de charset
          */
-        currentPasswordString.fill(charset.at(pos), nbChars);
-        currentPasswordArray.fill(pos, nbChars);
-        pos += nbValidChars / nbThreads;
+        //Set password to aaaa... and 0000... with the correct size (nbChars)
+        currentPasswordString.fill(charset.at(0), nbChars);
+        currentPasswordArray.fill(0, nbChars);
 
+        //Génération du premier mot de passe pour le thread en cours, en fonction de firstPasswordIndex et de nbToComputePerThread
+        long long decimalIndex = firstPasswordIndex;
+        unsigned indexInPassword = 0;//index allant de droite à gauche pour prendre chaque digit l'un après l'autre
+        while (decimalIndex > 0 && indexInPassword < nbChars) {
+            currentPasswordArray[indexInPassword] = decimalIndex % nbValidChars;
+            currentPasswordString[nbChars - indexInPassword - 1] = charset.at(decimalIndex % nbValidChars);
 
-        //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
-        long long unsigned int nbToComputeDivided = ceil((double) nbToCompute / nbThreads);
+            decimalIndex /= nbValidChars;//Division par nbValidChars pour avoir le prochain digit à sa gauche au tour d'après
+            ++indexInPassword;
+        }
+
         logger() << std::endl
                  << "Setup thread " << i
+                 << " with firstPasswordIndex = " << firstPasswordIndex
                  << " with first pwd=" << currentPasswordString.toStdString() << std::endl
-                 << " with currentPasswordArray[0]=" << currentPasswordArray.at(0) << std::endl;
+                 //  << " with currentPasswordArray="
+                 //  << currentPasswordArray.at(0) << " "
+                 //  << currentPasswordArray.at(1) << " "
+                 << std::endl;
+
+        //Définir le prochain index de début pour le prochain thread
+        firstPasswordIndex += nbToComputePerThread;
+        //Ne pas créer de thread en plus quand on a dépassé le nombre total à créer
+        if (firstPasswordIndex > nbToCompute) break;
+
         PcoThread *currentThread =
                 new PcoThread(monHack, hash, salt, currentPasswordString,
                               currentPasswordArray, charset, nbChars,
-                              nbToComputeDivided, nbToCompute, this);
+                              nbToComputePerThread, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
         currentThread->requestStop();
     }

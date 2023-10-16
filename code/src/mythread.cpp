@@ -19,7 +19,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
 
     QCryptographicHash md5(QCryptographicHash::Md5);
 
-    logger().setVerbosity(0);
+    logger().setVerbosity(1);
 
     nbValidChars = charset.length();
 
@@ -35,7 +35,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
         /* On calcul le hash */
         currentHash = md5.result().toHex();
 
-        logger() << " " << currentPasswordString.toStdString() << " "
+        logger() << " " << currentPasswordString.toStdString()
                  << (currentHash == hash ? " PWD IS FOUND !" : "");
         /*
          * Si on a trouvé, on retourne le mot de passe courant (sans le sel) et on arrête la recherche
