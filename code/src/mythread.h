@@ -16,7 +16,7 @@
  * \param charset tout les caractère pouvant être utilisé dans notre mot de passe
  * \param nbChars nombre de caractère de notre mot de passe
  * \param nbToCompute nombre de mot de passe à tester
- * \param nombree maximum de mot de passe à tester lors de multithreading
+ * \param maxCompute maximum de mot de passe à tester lors de multithreading
  * \param threadManager permet l'appelle aux méthode de la classe ThreeadManager
  */
 void monHack(QString hash, QString salt, QString currentPasswordString,

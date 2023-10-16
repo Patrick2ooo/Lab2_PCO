@@ -5,6 +5,7 @@
 #include "pcosynchro/pcothread.h"
 #include "threadmanager.h"
 #include <numeric>
+#include <pcosynchro/pcologger.h>
 
 extern QString resultat;
 
@@ -53,7 +54,7 @@ QString ThreadManager::startHacking(
         unsigned int nbChars,
         unsigned int nbThreads) {
 
-    long long unsigned int nbToCompute;
+    logger().setVerbosity(1);
 
 
     //Init du resultat avant chaque nouvelle recherche de mot de passe
@@ -88,13 +89,22 @@ QString ThreadManager::startHacking(
     /*
      * Calcul du nombre de hash à générer
      */
-    nbToCompute = intPow(charset.length(), nbChars);
+    long long unsigned int nbToCompute = intPow(charset.length(), nbChars);
 
     /*
      * Nombre de caractères différents pouvant composer le mot de passe
      */
     nbValidChars = charset.length();
 
+    logger() << std::endl
+             << std::endl
+             << "Starting bruteforce on " << hash.toStdString()
+             << std::endl
+             << " with pwd length of " << nbChars << " and "
+             << nbThreads << " threads..." << std::endl
+             << "Charset: " << charset.toStdString() << std::endl
+             << std::endl
+             << "Start:";
 
     int pos = 0;
     std::vector<std::unique_ptr<PcoThread>> threadList;
@@ -111,10 +121,17 @@ QString ThreadManager::startHacking(
         currentPasswordArray.fill(pos, nbChars);
         pos += nbValidChars / nbThreads;
 
+
         //TODO: should we fix this to avoid overlap (2 threads testing the same passwords)
         long long unsigned int nbToComputeDivided = ceil((double) nbToCompute / nbThreads);
-
-        PcoThread *currentThread = new PcoThread(monHack, hash, salt, currentPasswordString, currentPasswordArray, charset, nbChars, nbToComputeDivided, nbToCompute, this);
+        logger() << std::endl
+                 << "Setup thread " << i
+                 << " with first pwd=" << currentPasswordString.toStdString() << std::endl
+                 << " with currentPasswordArray[0]=" << currentPasswordArray.at(0) << std::endl;
+        PcoThread *currentThread =
+                new PcoThread(monHack, hash, salt, currentPasswordString,
+                              currentPasswordArray, charset, nbChars,
+                              nbToComputeDivided, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
         currentThread->requestStop();
     }

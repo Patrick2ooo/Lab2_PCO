@@ -2,6 +2,7 @@
 #include "threadmanager.h"
 #include <QCryptographicHash>
 #include <QString>
+#include <pcosynchro/pcologger.h>
 #include <string>
 
 QString resultat = "";//Mot de passe trouvé au final, reste "" si pas trouvé
@@ -14,11 +15,11 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
     QString currentHash;
     unsigned int nbValidChars;
     unsigned int i;
-    long long unsigned int nbComputed;
-
-    nbComputed = 0;
+    long long unsigned int nbComputed = 0;
 
     QCryptographicHash md5(QCryptographicHash::Md5);
+
+    logger().setVerbosity(0);
 
     nbValidChars = charset.length();
 
@@ -34,6 +35,8 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
         /* On calcul le hash */
         currentHash = md5.result().toHex();
 
+        logger() << " " << currentPasswordString.toStdString() << " "
+                 << (currentHash == hash ? " PWD IS FOUND !" : "");
         /*
          * Si on a trouvé, on retourne le mot de passe courant (sans le sel) et on arrête la recherche
          */
@@ -47,7 +50,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
          * Tous les 1000 hash calculés, on notifie l'avancement des threads
          */
         if ((nbComputed % 1000) == 0) {
-            threadManager->incrementPercentComputed((double) 1000 / maxCompute);
+            threadManager->incrementPercentComputed((double) 1000 / (double) maxCompute);
         }
         /*
          * On récupère le mot de pass à tester suivant.
