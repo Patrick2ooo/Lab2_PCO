@@ -1,9 +1,9 @@
 #ifndef MYTHREAD_H
 #define MYTHREAD_H
 
+#include "threadmanager.h"
 #include <QString>
 #include <pcosynchro/pcothread.h>
-#include "threadmanager.h"
 
 
 /**
@@ -19,6 +19,9 @@
  * \param nombree maximum de mot de passe à tester lors de multithreading
  * \param threadManager permet l'appelle aux méthode de la classe ThreeadManager
  */
-void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute,long long unsigned int maxCompute , ThreadManager *threadManager);
+void monHack(QString hash, QString salt, QString currentPasswordString,
+             QVector<unsigned int> currentPasswordArray, QString charset,
+             unsigned int nbChars, long long unsigned int nbToCompute,
+             long long unsigned int maxCompute, ThreadManager *threadManager);
 
 #endif// MYTHREAD_H

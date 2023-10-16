@@ -131,11 +131,3 @@ QString ThreadManager::startHacking(
 
     return resultat;
 }
-
-
-
-
-
-
-
-

@@ -7,8 +7,10 @@
 QString resultat = "";//Mot de passe trouvé au final, reste "" si pas trouvé
 
 
-
-void monHack(QString hash, QString salt, QString currentPasswordString, QVector<unsigned int> currentPasswordArray, QString charset, unsigned int nbChars, long long unsigned int nbToCompute,long long unsigned int maxCompute, ThreadManager *threadManager) {
+void monHack(QString hash, QString salt, QString currentPasswordString,
+             QVector<unsigned int> currentPasswordArray, QString charset,
+             unsigned int nbChars, long long unsigned int nbToCompute,
+             long long unsigned int maxCompute, ThreadManager *threadManager) {
     QString currentHash;
     unsigned int nbValidChars;
     unsigned int i;
@@ -36,7 +38,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
          * Si on a trouvé, on retourne le mot de passe courant (sans le sel) et on arrête la recherche
          */
 
-        if (currentHash == hash){
+        if (currentHash == hash) {
             resultat = currentPasswordString;
             nbComputed = maxCompute;
         }
@@ -45,7 +47,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString, QVector<
          * Tous les 1000 hash calculés, on notifie l'avancement des threads
          */
         if ((nbComputed % 1000) == 0) {
-            threadManager->incrementPercentComputed((double)1000/maxCompute);
+            threadManager->incrementPercentComputed((double) 1000 / maxCompute);
         }
         /*
          * On récupère le mot de pass à tester suivant.
