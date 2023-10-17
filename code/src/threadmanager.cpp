@@ -54,7 +54,7 @@ QString ThreadManager::startHacking(
         unsigned int nbChars,
         unsigned int nbThreads) {
 
-    logger().setVerbosity(1);
+    logger().setVerbosity(0);
 
 
     //Init du resultat avant chaque nouvelle recherche de mot de passe
@@ -155,14 +155,16 @@ QString ThreadManager::startHacking(
         //Définir le prochain index de début pour le prochain thread
         firstPasswordIndex += nbToComputePerThread;
         //Ne pas créer de thread en plus quand on a dépassé le nombre total à créer
-        if (firstPasswordIndex > nbToCompute) break;
+        if (firstPasswordIndex > nbToCompute) {
+            nbThreads = i;
+            break;
+        }
 
         PcoThread *currentThread =
                 new PcoThread(monHack, hash, salt, currentPasswordString,
                               currentPasswordArray, charset, nbChars,
                               nbToComputePerThread, nbToCompute, this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
-        currentThread->requestStop();
     }
 
     /* Attends la fin de chaque thread et libère la mémoire associée.

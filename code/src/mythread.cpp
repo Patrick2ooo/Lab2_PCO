@@ -19,7 +19,7 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
 
     QCryptographicHash md5(QCryptographicHash::Md5);
 
-    logger().setVerbosity(1);
+    logger().setVerbosity(0);
 
     nbValidChars = charset.length();
 
@@ -41,9 +41,15 @@ void monHack(QString hash, QString salt, QString currentPasswordString,
          * Si on a trouvé, on retourne le mot de passe courant (sans le sel) et on arrête la recherche
          */
 
+        //Si le resultat n'est pas vide, alors un autre thread a trouvé le mot de passe
+        // et il faut arrêter tous les autres threads
+        if (resultat != "") {
+            return;
+        }
+
         if (currentHash == hash) {
             resultat = currentPasswordString;
-            nbComputed = maxCompute;
+            return;
         }
 
         /*
